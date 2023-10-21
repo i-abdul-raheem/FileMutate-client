@@ -19,23 +19,12 @@ export const CompressImage = () => {
       }
       const res = await compressImage(file);
       if (res?.status === 200) {
-        const { mimetype, buffer, name } = res?.data;
-
-        // Convert the buffer (array of bytes) to a base64-encoded data URL
-        const arrayBufferView = new Uint8Array(buffer.data);
-        const blob = new Blob([arrayBufferView], { type: mimetype });
-        const imageUrl = URL.createObjectURL(blob);
-
-        // Create a temporary anchor element for download
+        const { url } = res?.data;
         const a = document.createElement("a");
-        a.href = imageUrl;
-        a.download = name;
-
-        // Simulate a click event on the anchor to trigger the download
+        a.href = url;
+        a.download = url?.split("/")[url?.split("/").length - 1];
+        a.target = "_blank";
         a.click();
-
-        // Clean up the temporary anchor
-        URL.revokeObjectURL(imageUrl);
         dispatch({
           type: "SUCCESS",
           payload: "Image compression was successful",
@@ -47,6 +36,7 @@ export const CompressImage = () => {
       setTimeout(() => {
         setFile(null);
         setLoading(false);
+        document.getElementById("file-input-form").reset();
       }, 1000);
     }
   };
